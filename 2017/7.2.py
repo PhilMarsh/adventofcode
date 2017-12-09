@@ -23,8 +23,6 @@ def parse_program(line):
     )
 
 def find_root_name(programs):
-    # values are parents;  keys are children
-    # root is the parent (value) that is not a child (key)
     all_children = set(
         child
         for p in programs.values()
