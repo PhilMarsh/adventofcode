@@ -38,7 +38,8 @@ class Core(object):
     def execute(self, max_duration=float("inf")):
         try:
             duration = 0
-            while 0 <= self.progcount < len(self.mem) and duration < max_duration:
+            while (min(self.mem) <= self.progcount <= max(self.mem)
+                    and duration < max_duration):
                 inst = self.mem.get(self.progcount, NOOP)
                 # print(inst)
                 self._INSTRUCTION_LOOKUP[inst.action](self, *inst.args)
@@ -47,7 +48,16 @@ class Core(object):
         except:
             self._log("Uncaught Exception")
             raise
-        self._log("Reached Max Duration")
+        if not (min(self.mem) <= self.progcount <= max(self.mem)):
+            self._log(
+                "Left program boundaries ({0}, {1}): {2}"
+                .format(min(self.mem), max(self.mem), self.progcount)
+            )
+        else:
+            self._log(
+                "Reached Max Duration ({0}): {1}"
+                .format(max_duration, duration)
+            )
 
     def _resolve(self, val):
         if val.isalpha():

@@ -26,7 +26,8 @@ class ALU(object):
 
     def execute(self, max_duration=float("inf")):
         duration = 0
-        while 0 <= self.progcount < len(self.mem) and duration < max_duration:
+        while (min(self.mem) <= self.progcount <= max(self.mem)
+                and duration < max_duration):
             inst = self.mem.get(self.progcount, NOOP)
             # print(inst)
             self._INSTRUCTION_LOOKUP[inst.action](self, *inst.args)
