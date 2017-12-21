@@ -100,4 +100,4 @@ for _ in range(5):
     art = evolve(art, rules)
 
 print("\n\n", str_grid(art).replace("/", "\n"))
-print(sum(1 if cell == "#" else 0 for cell in str_grid(art)))
+print(str_grid(art).count("#"))
