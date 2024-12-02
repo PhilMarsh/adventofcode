@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+
 def main():
     left = list()
     right = list()
@@ -13,10 +14,7 @@ def main():
     for num in right:
         right_counts[num] += 1
 
-    res = sum(
-        a * right_counts.get(a, 0)
-        for a in left
-    )
+    res = sum(a * right_counts.get(a, 0) for a in left)
     print(res)
 
 

@@ -1,0 +1,97 @@
+[tool.poetry]
+package-mode = false
+
+# keep sorted with `poetry self add poetry-plugin-sort`.
+[tool.poetry.dependencies]
+python = "~3.12.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+isort = "^5.13.2"
+pylint = "^3.2.1"
+pylint-absolute-imports = "^1.1.0"
+
+[tool.black]
+
+[tool.isort]
+# follow Black's formatting to avoid conflicts.
+profile = "black"
+# module-scope stuff is separated by 2 lines. why not imports too.
+lines_after_imports = 2
+# every `import` line imports only one thing; every imported thing gets its
+# own `import` line.
+force_single_line = true
+# enabling this really means "don't group by syntax", ie: don't group
+# `import x` lines above `from x import y` lines; just sort by module names.
+force_sort_within_sections = true
+# "type" just means "naming convention". so disabling this means "don't
+# group by naming convention", ie: don't group `ALL_CAPS`, `CamelCase`, and
+# `snake_case` separately. just sort alphabetically.
+order_by_type = false
+
+[tool.pylint.MAIN]
+load-plugins = [
+    # require all imports to be absolute.
+    # NOTE: relative imports aren't exactly _bad_ in py3 because they must be
+    # explicit (unlike py2, which had dangerous "implicit" relative imports).
+    # but absolutes are still the most explicit, least ambiguous, and easiest
+    # to read.
+    "pylint_absolute_imports",
+]
+
+[tool.pylint.CLASSES]
+# `bad-mcs-classmethod-argument` defaults to `mcs`, which is terse and
+# undescriptive (and a name i've never seen in any project - philmarsh).
+valid-metaclass-classmethod-first-arg = ["metacls"]
+
+[tool.pylint.STRING_CONSTANT]
+# let `implicit-str-concat` detect concats across multiple lines.
+check-str-concat-over-line-jumps = true
+
+[tool.pylint."MESSAGES CONTROL"]
+# when a name is invalid, show the regex used to validate it.
+include-naming-hint = true
+# rules we don't want or need.
+disable = [
+    # Black handles formatting.
+    "format",
+    # TODO? enable? a docstring on every module might be reasonable.
+    "missing-module-docstring",
+    # a docstring on every class may be overkill.
+    # simple classes like dataclasses should be self-describing.
+    "missing-class-docstring",
+    # a docstring on every function is definitely overkill.
+    # small/simple functions should be obvious.
+    "missing-function-docstring",
+    # there is nothing wrong with using an explicit else/elif after
+    # a jump (break, continue, raise, return). the matching nesting
+    # may often read better, even if it's not strictly necessary.
+    "no-else-break",
+    "no-else-continue",
+    "no-else-raise",
+    "no-else-return",
+    # small classes aren't a bad thing.
+    "too-few-public-methods",
+    # there is nothing wrong with using `dict()` instead of `{}`.
+    # "saving a function call" means nothing 99.9% of the time.
+    "use-dict-literal",
+    # there is nothing wrong with using `list()` instead of `[]`.
+    # "saving a function call" means nothing 99.9% of the time.
+    "use-list-literal",
+    # isort handles import sorting.
+    "wrong-import-order",
+]
+# extra rules that aren't enabled by default.
+enable = [
+    # report invalid inline pylint directive.
+    "bad-inline-option",
+    # report outdated inlint pylint directives.
+    "deprecated-pragma",
+    # report inline pylint suppressions (`disable`, `disable-next`)
+    # that use cryptic codes like `W0611` instead of readable names
+    # like `unused-import`.
+    "use-symbolic-message-instead",
+    # report inline pylint suppressions (`disable`, `disable-next`)
+    # that are superfluous/obsolete.
+    "useless-suppression",
+]
