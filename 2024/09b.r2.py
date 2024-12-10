@@ -1,4 +1,3 @@
-import bisect
 import dataclasses
 import heapq
 import itertools
@@ -17,6 +16,10 @@ class _FileEntry:
     @property
     def total_size(self):
         return self.file_size + self.free_size_after
+
+    @property
+    def free_block_after(self):
+        return self.file_block + self.file_size
 
 
 class _Heap:
@@ -83,35 +86,31 @@ def _compact_file_entries(file_entries):
         if entry.free_size_after:
             free_space_heaps[entry.free_size_after].push((entry.file_block, entry))
 
-    source_index = len(file_entries) - 1
-    while source_index > 0:
-        source_entry = file_entries[source_index]
+    num_blocks = file_entries[-1].file_block + file_entries[-1].total_size
 
+    for source_entry in reversed(file_entries):
         donor_entry = _pop_donor_entry(free_space_heaps, source_entry)
         if donor_entry is None:
-            source_index -= 1
             continue
 
-        # rip file entry out of the list and heal behind it.
-        file_entries[source_index - 1].free_size_after += source_entry.total_size
-        del file_entries[source_index]
-
-        # make room for file entry and insert it back into the list at its
-        # new location.
-        source_entry.file_block = donor_entry.file_block + donor_entry.file_size
+        source_entry.file_block = donor_entry.free_block_after
         source_entry.free_size_after = (
             donor_entry.free_size_after - source_entry.file_size
         )
         donor_entry.free_size_after = 0
-        bisect.insort(file_entries, source_entry, key=_file_block_sort_key)
 
-        if (
-            source_entry.free_size_after
-            and file_entries[source_index] is not source_entry
-        ):
+        # ignore 0s and entries in the past (only entries to the right, which
+        # have already been processed, can have free space >9).
+        if 1 <= source_entry.free_size_after <= 9:
             free_space_heaps[source_entry.free_size_after].push(
                 (source_entry.file_block, source_entry)
             )
+
+    # recalculate all free space.
+    file_entries = sorted(file_entries, key=_file_block_sort_key)
+    for curr_file, next_file in zip(file_entries[:-1], file_entries[1:]):
+        curr_file.free_size_after = next_file.file_block - curr_file.free_block_after
+    file_entries[-1].free_size_after = num_blocks - file_entries[-1].free_block_after
 
     return file_entries
 
