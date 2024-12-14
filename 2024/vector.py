@@ -31,10 +31,16 @@ class Vector:
 
 @dataclasses.dataclass(frozen=True)
 class Box:
-    v1: Vector
-    v2: Vector
+    min: Vector
+    max: Vector
+
+    def __init__(self, v1, v2):
+        # need to call `object.__setattr__()` to work around `frozen=True`
+        # during setup.
+        object.__setattr__(self, "min", Vector(x=min(v1.x, v2.x), y=min(v1.y, v2.y)))
+        object.__setattr__(self, "max", Vector(x=max(v1.x, v2.x), y=max(v1.y, v2.y)))
 
     def __contains__(self, vector):
-        return (
-            self.v1.y <= vector.y <= self.v2.y or self.v1.y >= vector.y >= self.v2.y
-        ) and (self.v1.x <= vector.x <= self.v2.x or self.v1.x >= vector.x >= self.v2.x)
+        return (self.min.y <= vector.y <= self.max.y) and (
+            self.min.x <= vector.x <= self.max.x
+        )
