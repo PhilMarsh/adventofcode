@@ -6,6 +6,9 @@ class Vector:
     x: int
     y: int
 
+    def __neg__(self):
+        return __class__(x=-self.x, y=-self.y)
+
     def __sub__(self, other):
         return __class__(x=self.x - other.x, y=self.y - other.y)
 
@@ -27,6 +30,9 @@ class Vector:
 
     def unit(self):
         return self / self.magnitude()
+
+    def __lt__(self, other):
+        return False
 
 
 @dataclasses.dataclass(frozen=True)
