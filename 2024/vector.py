@@ -31,6 +31,9 @@ class Vector:
     def unit(self):
         return self / self.magnitude()
 
+    def manhattan(self):
+        return self.x + self.y
+
     def __lt__(self, other):
         return False
 
