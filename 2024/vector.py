@@ -32,7 +32,7 @@ class Vector:
         return self / self.magnitude()
 
     def manhattan(self):
-        return self.x + self.y
+        return abs(self.x) + abs(self.y)
 
     def __lt__(self, other):
         return False
