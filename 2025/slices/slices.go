@@ -1,4 +1,4 @@
-package iter
+package slices
 
 func Map[T any, U any](values []T, transform func(T) U) []U {
 	/*
