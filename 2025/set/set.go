@@ -41,3 +41,11 @@ func (self Set[T]) Iter() func(yield func(T) bool) {
 		}
 	}
 }
+
+func (self Set[T]) Union(other Set[T]) Set[T] {
+	union := self.Clone()
+	for value := range other.Iter() {
+		union.Add(value)
+	}
+	return union
+}

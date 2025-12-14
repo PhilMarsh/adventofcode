@@ -1,3 +1,3 @@
 module aoc2025
 
-go 1.18
+go 1.23
